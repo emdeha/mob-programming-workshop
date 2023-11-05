@@ -1,0 +1,157 @@
+Какви стоки има?
+- Стоки на бройка
+- Стоки на количество
+
+На какви цени?
+
+Какви типове отстъпки има?
+- Процентна
+- Намаление за количество (вземи 3 за 2)
+- Вземи 2 и третото е безплатно
+
+class Money {
+  int amountCents;
+  string currency;
+}
+
+class Product {
+  string name;
+  string id;
+}
+
+class ProductPrice {
+  Product product;
+  int quantity;
+  Money price;
+}
+
+class OneItemOrder {
+  int quantity;
+  Product prod;
+}
+
+class Order {
+  OneItemOrder[] orders;
+}
+
+Имаме отстъпка 3 за 1 лев.
+Цената за 1 бройка е 1.50 лева.
+Човек купува 10.
+Крайна цена:
+ - 10 / 3 = 3. 3 лева за 3-те групи с отстъпка
+ - 10 % 3 = 1. Останалото е 1.50
+ - Крайна цена: 3 + 1.50 = 4.50
+
+Какво става като имаме 2 различни продукта. 
+
+prod = Product("prod", "123")
+banana = Product("banana", "2")
+water = Product("water", "3")
+productPrices = {
+  prod: [
+    ProductPrice(1, prod, 3),
+    ProductPrice(1.50, prod, 1)
+  ],
+  banana: [
+    ProductPrice(1, banana, 3)
+  ]
+}
+
+order = Order(orders = [OneItemOrder(10, prod)]);
+
+function calculatePrice(Order order) {
+  int price = 0;
+
+  for (item in order.orders) {
+    int count = item.quantity;
+    while (count > 0) {
+      for (pp in productPrices[item.prod]) {
+        if (pp.quantity > count) continue;
+        else {
+          count -= pp.quantity;
+          price += pp.price;
+          break;
+        }
+      }
+    }
+  }
+
+  return price;
+}
+
+Retrospective:
+Какво ни харесва в работата заедно?
+- Надграждане в идеите. Съгласихме се на 1 крайна идея
+- Допълваме се в идеите, които споделяме
+- Разнообразие от идеи. Стигаме до консенсус. 
+- Отворени сме към гледната точка на другия
+- Лесно се намират edge cases
+- Обсъждахме плюсове и минуси на всяка идея +1
+- Контролираме се да не влезем в заешки дупки
+- Търсим си проблемите 
+Какво можем да подобрим?
+- Твърде напрегната дискусия на моменти
+- Показване всички идеи на екрана / дъска
+- Някои хора са по-пасивни. Хубаво е да им дадем шанс да
+  представят идеи
+- Да решим какво искаме да постигнем
+- Преди да започнем нова тема, да я поставим ясно на дъската
+- Да разбиваме големия проблем на по-малки в началото
+- Да решаваме на къде да продължим с консенсус
+- Да си направим mind map на идеите и целите
+- Всеки да си води бележки за да знае до къде е
+- Да се разделим на два екипа
+- Как можем да олекотим контекста?
+Други:
+- Имаме
+
+
+---------------------
+
+
+
+class ProductPrice {
+    Product product;
+    int quantity;
+    Money price;
+    List<ProductPrice> connectedProducts;
+    boolean isVisited;
+
+    hashCode() { hash(product) + hash(quantity) }
+}
+
+Map<hashCode(ProductPrice), ProductPrice> productPrices = map();
+function addProductPrice( ... ) {
+  productPrices[...] = ...
+}
+
+function addDiscount( sourceProduct, sourceProductQuantity, targetProduct, targetProductQuantity) {
+ sourceHash = hash(sp, spq);
+ targetHash = hash(tp, tpq)
+ if (map not contains source hash) { create source hash }
+ if (map not contains target hash) { create target hash }
+
+ source.connectedProducts.add(target);
+ target.connectedProducts.add(source); 
+}
+
+
+function order(product, quantity) {
+  pp = productPrices[hash(product, quantity)];
+  traverse(pp);
+}
+
+static price = 0;
+function traverse(pp) {
+  prices += pp.price;
+  for (nestedPP in pp.connectedProducts) {
+    if(nestedPP.isVisited) {
+      continue;
+    }
+
+    nestedPP.isVisited = true;
+    
+    traverse(nestedPP);
+  }
+}
+
